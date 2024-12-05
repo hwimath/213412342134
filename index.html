@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>어근 : 법 법 (法) - 초등어휘 단어 게임</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #F0F8FF;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #4682B4;
+        }
+        .hidden {
+            display: none;
+        }
+        .section {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #E6F2FF;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #4682B4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 15px 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #4169E1;
+        }
+        .quiz-option {
+            display: block;
+            text-align: left;
+            margin: 10px 0;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        #score {
+            font-size: 24px;
+            color: #32CD32;
+        }
+        #incorrectAnswers {
+            text-align: left;
+            margin-top: 20px;
+        }
+        #incorrectAnswers p {
+            color: #FF4500;
+        }
+    </style>
+</head>
+<body>
+
+<h1>✨ 어근 : 법 법 (法) - 초등어휘 단어 게임 ✨</h1>
+
+<div id="studySection" class="section">
+    <div id="studyContent">
+        <!-- Study content will be injected here -->
+    </div>
+    <button class="button" id="nextStudyBtn">다음</button>
+</div>
+
+<div id="quizSection" class="section hidden">
+    <h2>단어 퀴즈</h2>
+    <div id="quizContent">
+        <!-- Quiz content will be injected here -->
+    </div>
+    <button class="button" id="nextQuizBtn">다음</button>
+    <button class="button hidden" id="submitQuizBtn">제출</button>
+</div>
+
+<div id="scoreSection" class="section hidden">
+    <h2>🎉 점수 🎉</h2>
+    <p id="score">0 / 10</p>
+    <div id="incorrectAnswers">
+        <!-- Incorrect answers will be displayed here -->
+    </div>
+    <button class="button" onclick="location.reload()">다시 하기</button>
+</div>
+
+<script>
+// 데이터 정의
+const words = [
+    { word: "법률", definition: "법에 관련된 규칙이나 규범." },
+    { word: "법원", definition: "법을 집행하고 재판을 하는 기관." },
+    { word: "법규", definition: "법에서 정한 규칙이나 규범." },
+    { word: "법칙", definition: "일정한 규칙이나 법." },
+    { word: "법학", definition: "법을 연구하는 학문." },
+    { word: "법제", definition: "법을 제정하고 관리하는 체계." },
+    { word: "법인", definition: "법에 의해 인정된 단체나 기관." },
+    { word: "법정", definition: "재판이 이루어지는 장소." },
+    { word: "법관", definition: "법을 집행하고 재판을 담당하는 사람." },
+    { word: "법령", definition: "정부가 제정한 법과 규칙." }
+];
+
+const sentences = {
+    "법률": [
+        "그는 법률을 공부하고 있다.",
+        "새로운 법률이 제정되었다.",
+        "법률을 잘 이해해야 한다."
+    ],
+    "법원": [
+        "그 사건은 법원에서 심리되었다.",
+        "법원에 출석해야 한다.",
+        "법원은 공정하게 판결을 내렸다."
+    ],
+    "법규": [
+        "회사에서는 법규를 준수해야 한다.",
+        "해양 법규를 어기면 벌을 받을 수 있다.",
+        "법규에 따라 행동하세요."
+    ],
+    "법칙": [
+        "자연의 법칙을 배우고 있다.",
+        "새로운 법칙이 발견되었다.",
+        "모든 일에는 법칙이 있다."
+    ],
+    "법학": [
+        "그는 법학을 전공했다.",
+        "법학 교수님께 질문했다.",
+        "법학은 어려운 학문이다."
+    ],
+    "법제": [
+        "법제의 변화가 필요하다.",
+        "법제를 개선하기 위한 논의가 이루어졌다.",
+        "법제는 사회를 규율한다."
+    ],
+    "법인": [
+        "그 회사는 법인으로 등록되었다.",
+        "법인은 독립된 존재이다.",
+        "법인은 법의 보호를 받는다."
+    ],
+    "법정": [
+        "그는 법정에서 증언했다.",
+        "법정에서 변호사가 말했다.",
+        "법정에서는 조용히 해야 한다."
+    ],
+    "법관": [
+        "법관이 판결을 내렸다.",
+        "법관은 공정해야 한다.",
+        "법관은 사건을 신중하게 검토했다."
+    ],
+    "법령": [
+        "새로운 법령이 발표되었다.",
+        "법령을 위반하면 처벌받을 수 있다.",
+        "정부는 법령을 시행했다."
+    ]
+};
+
+const quizQuestions = [
+    {
+        question: "1. 그는 ____을 공부하고 있다.",
+        options: ["법학", "법원"],
+        correctAnswer: "법학"
+    },
+    {
+        question: "2. 그 사건은 ____에서 심리되었다.",
+        options: ["법원", "법령"],
+        correctAnswer: "법원"
+    },
+    {
+        question: "3. 회사에서는 ____을 준수해야 한다.",
+        options: ["법규", "법정"],
+        correctAnswer: "법규"
+    },
+    {
+        question: "4. 모든 일에는 ____이 있다.",
+        options: ["법칙", "법관"],
+        correctAnswer: "법칙"
+    },
+    {
+        question: "5. 그는 ____을 전공했다.",
+        options: ["법학", "법인"],
+        correctAnswer: "법학"
+    },
+    {
+        question: "6. ____의 변화가 필요하다.",
+        options: ["법제", "법률"],
+        correctAnswer: "법제"
+    },
+    {
+        question: "7. 그 회사는 ____으로 등록되었다.",
+        options: ["법인", "법정"],
+        correctAnswer: "법인"
+    },
+    {
+        question: "8. 그는 ____에서 증언했다.",
+        options: ["법정", "법원"],
+        correctAnswer: "법정"
+    },
+    {
+        question: "9. ____이 판결을 내렸다.",
+        options: ["법관", "법률"],
+        correctAnswer: "법관"
+    },
+    {
+        question: "10. 새로운 ____이 발표되었다.",
+        options: ["법령", "법칙"],
+        correctAnswer: "법령"
+    }
+];
+
+// 상태 변수
+let currentWordIndex = 0;
+let currentQuizIndex = 0;
+let score = 0;
+let incorrectAnswers = [];
+
+// 초기화 함수
+function showDefinition() {
+    if (currentWordIndex < words.length) {
+        const word = words[currentWordIndex];
+        document.getElementById('studyContent').innerHTML = `
+            <h2>단어 뜻 배우기 (어근: 법 법)</h2>
+            <h3>${word.word}</h3>
+            <p>${word.definition}</p>
+        `;
+    } else {
+        // 모든 단어 학습이 끝나면 퀴즈 시작
+        document.getElementById('studySection').classList.add('hidden');
+        initQuiz();
+        document.getElementById('quizSection').classList.remove('hidden');
+    }
+}
+
+function showSentences() {
+    const word = words[currentWordIndex];
+    const sentenceList = sentences[word.word];
+    let sentencesHTML = `<h2>예문 배우기 (어근: 법 법)</h2><h3>${word.word}</h3>`;
+    sentenceList.forEach(sentence => {
+        sentencesHTML += `<p>• ${sentence}</p>`;
+    });
+    document.getElementById('studyContent').innerHTML = sentencesHTML;
+}
+
+// 버튼 이벤트 리스너
+document.getElementById('nextStudyBtn').addEventListener('click', () => {
+    if (document.getElementById('studyContent').innerHTML.includes('단어 뜻 배우기')) {
+        showSentences();
+    } else {
+        currentWordIndex++;
+        showDefinition();
+    }
+});
+
+// 옵션 섞기 함수
+function shuffleOptions(options) {
+    let shuffled = options.slice(); // 복사본 생성
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// 퀴즈 함수
+function initQuiz() {
+    if (currentQuizIndex < quizQuestions.length) {
+        const q = quizQuestions[currentQuizIndex];
+        const shuffledOptions = shuffleOptions(q.options);
+        document.getElementById('quizContent').innerHTML = `
+            <p>${q.question}</p>
+            ${shuffledOptions.map((option, index) => `
+                <label class="quiz-option">
+                    <input type="radio" name="quiz${currentQuizIndex}" value="${option}">
+                    ${option}
+                </label>
+            `).join('')}
+        `;
+        // Toggle buttons
+        if (currentQuizIndex === quizQuestions.length - 1) {
+            document.getElementById('nextQuizBtn').classList.add('hidden');
+            document.getElementById('submitQuizBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('nextQuizBtn').classList.remove('hidden');
+        }
+    }
+}
+
+document.getElementById('nextQuizBtn').addEventListener('click', () => {
+    const q = quizQuestions[currentQuizIndex];
+    const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+    if (selected) {
+        if (selected.value === q.correctAnswer) {
+            score++;
+        } else {
+            incorrectAnswers.push({
+                question: q.question,
+                yourAnswer: selected.value,
+                correctAnswer: q.correctAnswer
+            });
+        }
+        currentQuizIndex++;
+        initQuiz();
+    } else {
+        alert("답을 선택해주세요!");
+    }
+});
+
+document.getElementById('submitQuizBtn').addEventListener('click', () => {
+    const q = quizQuestions[currentQuizIndex];
+    const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+    if (selected) {
+        if (selected.value === q.correctAnswer) {
+            score++;
+        } else {
+            incorrectAnswers.push({
+                question: q.question,
+                yourAnswer: selected.value,
+                correctAnswer: q.correctAnswer
+            });
+        }
+        currentQuizIndex++;
+        showScore();
+    } else {
+        alert("답을 선택해주세요!");
+    }
+});
+
+function showScore() {
+    document.getElementById('quizSection').classList.add('hidden');
+    document.getElementById('score').innerText = `${score} / ${quizQuestions.length}`;
+    if (incorrectAnswers.length > 0) {
+        let incorrectHTML = "<h3>틀린 문제</h3>";
+        incorrectAnswers.forEach(item => {
+            incorrectHTML += `
+                <p><strong>문제:</strong> ${item.question}</p>
+                <p><strong>당신의 답:</strong> ${item.yourAnswer}</p>
+                <p><strong>정답:</strong> ${item.correctAnswer}</p>
+                <hr>
+            `;
+        });
+        document.getElementById('incorrectAnswers').innerHTML = incorrectHTML;
+    } else {
+        document.getElementById('incorrectAnswers').innerHTML = "<p>모든 문제를 맞추셨습니다! 훌륭해요! 🎉</p>";
+    }
+    document.getElementById('scoreSection').classList.remove('hidden');
+}
+
+// 초기화 시작
+showDefinition();
+</script>
+
+</body>
+</html>
